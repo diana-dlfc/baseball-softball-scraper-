@@ -1,0 +1,21 @@
+# Secretos: NUNCA dentro de la imagen (van como variables de entorno)
+.env
+credentials/
+
+# Entornos y caches locales
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Datos locales
+logs/
+output/
+
+# IDEs y sistema
+.vscode/
+.idea/
+.git/
+.DS_Store
+Thumbs.db

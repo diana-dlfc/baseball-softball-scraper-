@@ -31,6 +31,17 @@ USER_AGENT = (
 # Recursos que no aportan al scraping de texto/links y frenan la carga
 BLOCKED_RESOURCE_TYPES = {"image", "media", "font"}
 
+# Flags OBLIGATORIOS para Chromium en Docker/Railway:
+# /dev/shm está limitado a 64MB en Docker y Chromium crashea sin estos.
+# En local no estorban.
+CHROMIUM_ARGS = [
+    "--no-sandbox",
+    "--disable-dev-shm-usage",
+    "--disable-gpu",
+    "--disable-software-rasterizer",
+    "--disable-blink-features=AutomationControlled",
+]
+
 
 class PlaywrightManager:
     """Administra un navegador Chromium compartido y sus páginas."""
@@ -48,7 +59,8 @@ class PlaywrightManager:
     async def start(self) -> None:
         self._playwright = await async_playwright().start()
         self._browser = await self._playwright.chromium.launch(
-            headless=self.headless
+            headless=self.headless,
+            args=CHROMIUM_ARGS,
         )
         logger.debug("Navegador Chromium iniciado")
 

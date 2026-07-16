@@ -22,7 +22,7 @@ from app.sheets.google_sheets import SheetsClient
 from app.utils.logger import logger, log_task
 
 HEADER = [
-    "Business Name", "Category", "City", "State", "Address",
+    "Business Name", "City", "State", "Address",
     "Baseball", "Softball", "Phone", "Url Google Maps",
     "Indoor", "Outdoor", "Website", "Email", "Facebook",
     "Instagram", "Youtube", "Tiktok", "Owner", "Rating", "Reviews",
@@ -44,7 +44,6 @@ def business_to_row(business: Business) -> list:
     """Convierte un Business en una fila con el orden de HEADER."""
     return [
         business.business_name or "",
-        business.category or "",
         business.city or "",
         STATE_ABBR.get(business.state or "", business.state or ""),
         business.address or "",

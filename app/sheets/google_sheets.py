@@ -10,6 +10,7 @@ reintentos con esperas largas para absorber los 429.
 import gspread
 
 from app.config.settings import GOOGLE_SERVICE_ACCOUNT_FILE, GOOGLE_SHEETS_ID
+from app.utils.helpers import ensure_google_credentials
 from app.utils.logger import logger
 from app.utils.retry import retry
 
@@ -35,6 +36,7 @@ class SheetsClient:
         if not self.spreadsheet_id:
             raise EnvironmentError("Falta GOOGLE_SHEETS_ID en el archivo .env")
 
+        ensure_google_credentials()
         self._gc = gspread.service_account(filename=self.service_account_file)
         self._spreadsheet = self._gc.open_by_key(self.spreadsheet_id)
 

@@ -37,7 +37,7 @@ BUSINESS_TIMEOUT = 120  # segundos
 
 # Reinicio preventivo del navegador: Chromium acumula memoria y termina
 # muriendo en corridas largas; una instancia fresca cada N negocios lo evita
-BROWSER_RESTART_AFTER = 500
+from app.config.settings import BROWSER_RESTART_AFTER  # noqa: E402
 
 
 @dataclass
@@ -139,10 +139,20 @@ async def run_scrape_pipeline(
                     keep_going = False
                     break
 
+                ok_before = stats.ok
                 await asyncio.gather(
                     *(_process_business(manager, b, stats) for b in batch)
                 )
                 processed_with_this_browser += len(batch)
+
+                # Lote completo sin un solo éxito = navegador probablemente
+                # muerto -> forzar reinicio inmediato (no esperar a los 500)
+                if stats.ok == ok_before and len(batch) >= 5:
+                    logger.warning(
+                        "Lote completo fallido: navegador posiblemente muerto. "
+                        "Forzando reinicio inmediato."
+                    )
+                    break
                 logger.info(
                     f"Progreso: {stats.processed} procesados | "
                     f"{stats.ok} ok | {stats.unreachable} inaccesibles | "

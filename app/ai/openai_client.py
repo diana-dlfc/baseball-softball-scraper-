@@ -10,17 +10,10 @@ import time
 from openai import OpenAI, RateLimitError
 
 from app.config.settings import (
-    LLM_API_KEY,
     LLM_BASE_URL,
     LLM_DISABLE_THINKING,
-    LLM_FALLBACK_API_KEY,
-    LLM_FALLBACK_BASE_URL,
-    LLM_FALLBACK_MODEL,
-    LLM_FALLBACK2_API_KEY,
-    LLM_FALLBACK2_BASE_URL,
-    LLM_FALLBACK2_MODEL,
     LLM_MAX_TOKENS,
-    LLM_MODEL,
+    LLM_PROVIDERS,
     LLM_TEMPERATURE,
 )
 from app.utils.logger import logger
@@ -38,32 +31,15 @@ class LLMClient:
     """
 
     def __init__(self) -> None:
-        if not LLM_API_KEY:
-            raise EnvironmentError("Falta LLM_API_KEY en el archivo .env")
+        if not LLM_PROVIDERS:
+            raise EnvironmentError(
+                "No hay proveedores LLM configurados en el .env (LLM_API_KEY...)"
+            )
 
         self._providers: list[tuple[OpenAI, str]] = [
-            (OpenAI(api_key=LLM_API_KEY, base_url=LLM_BASE_URL), LLM_MODEL)
+            (OpenAI(api_key=key, base_url=url or LLM_BASE_URL), model)
+            for key, url, model in LLM_PROVIDERS
         ]
-        if LLM_FALLBACK_API_KEY and LLM_FALLBACK_MODEL:
-            self._providers.append(
-                (
-                    OpenAI(
-                        api_key=LLM_FALLBACK_API_KEY,
-                        base_url=LLM_FALLBACK_BASE_URL or LLM_BASE_URL,
-                    ),
-                    LLM_FALLBACK_MODEL,
-                )
-            )
-        if LLM_FALLBACK2_API_KEY and LLM_FALLBACK2_MODEL:
-            self._providers.append(
-                (
-                    OpenAI(
-                        api_key=LLM_FALLBACK2_API_KEY,
-                        base_url=LLM_FALLBACK2_BASE_URL or LLM_BASE_URL,
-                    ),
-                    LLM_FALLBACK2_MODEL,
-                )
-            )
         logger.info(
             f"LLM: {len(self._providers)} proveedor(es) en rotación: "
             + ", ".join(model for _, model in self._providers)
