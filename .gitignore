@@ -1,0 +1,26 @@
+# Secretos — NUNCA subir
+.env
+credentials/*.json
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Salidas y logs del scraper
+logs/
+output/
+
+# IDEs
+.vscode/
+.idea/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
